@@ -15,6 +15,7 @@ import numpy as np
 
 (x_train, _), (x_test, _) = mnist.load_data()
 
+
 class autoencoder:
     def __init__(self, n_input, n_h1, n_h2, n_latent, learning_rate=0.001, n_batch=100,
                  n_epoch=100, checkpoint_path='checkpoints/', model_name='model.h5'):
