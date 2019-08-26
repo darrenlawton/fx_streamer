@@ -59,13 +59,12 @@ class fxClient:
         self.api_key = dc.validate_key(dc.AV_API_KEY)
 
     def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
+        payload = {
+            'function': dc.AV_FUNCTION_CALL,
+            'from_currency': from_currency.upper(),
+            'to_currency': to_currency.upper()
+        }
 
-        #     parameters = {
-        #         'function': 'CURRENCY_EXCHANGE_RATE',
-        #         'from_currency': from_currency.upper(),
-        #         'to_currency': to_currency.upper()
-        #     }
-        #
         #     download = self._av_api_call(parameters, **kwargs)
         #     return download if download is not None else None
 
