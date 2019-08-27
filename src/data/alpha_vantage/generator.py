@@ -5,7 +5,7 @@
 # understand this: https://stackoverflow.com/questions/14132789/relative-imports-for-the-billionth-time/14132912#14132912
 # https://urllib3.readthedocs.io/en/latest/user-guide.html#using-timeouts
 
-import json, urllib3
+import json, urllib3, itertools.
 from multiprocessing.pool import ThreadPool
 from src.data import data_config as dc
 
@@ -59,7 +59,7 @@ class fxClient:
         :returns: list fx rates in json format
         """
         pool = ThreadPool(len(from_currencies))
-        response_list = pool.starmap(self.get_fx_rate, zip(from_currencies, repeat(to_currency)))
+        response_list = pool.starmap(self.get_fx_rate, zip(from_currencies, itertools.repeat(to_currency)))
         pool.close()
         pool.join()
         return response_list
