@@ -51,21 +51,15 @@ class fxClient:
             return json.loads(response.data)
         else: return None
 
-    def get_fx_batch(self, from_currencies, to_currency: str = 'USD'):
+    def get_batch_fx_rate(self, from_currencies, to_currency: str = 'USD'):
         """
         threaded request for retrieving multiple
         :param from_currencies: a list of currencies
         :param to_currency: a string being the base currency
         :returns: list fx rates in json format
         """
-        
-        return None
-
-    def threaded_requests(self):
-        # pool = ThreadPool(len(symbols))
-        # results = pool.map(function, symbols)
-        # pool.close()
-        # pool.join()
-        #
-        # return results
-        return None
+        pool = ThreadPool(len(from_currencies))
+        response_list = pool.map(self.get_fx_rate, from_currencies)
+        pool.close()
+        pool.join()
+        return response_listv
