@@ -59,7 +59,7 @@ class fxClient:
         :returns: list fx rates in json format
         """
         pool = ThreadPool(len(from_currencies))
-        response_list = pool.map(self.get_fx_rate, from_currencies)
+        response_list = pool.starmap(self.get_fx_rate, zip(from_currencies, repeat(to_currency)))
         pool.close()
         pool.join()
         return response_list
