@@ -18,11 +18,18 @@ class fxClient:
         self.av_function = dc.AV_FUNCTION_CALL 
         
     def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
+        """
+        Fetch realtime exchange rate for given ccy pair
+        :param from_currency: the ccy to get the exchange rate for
+        :param to_currency: the destination ccy for the exchange rate
+        :returns: realtime quote for ccy pair in json format
+        """
         payload = {
             'function': self.av_function,
             'from_currency': from_currency.upper(),
             'to_currency': to_currency.upper()
         }
+
         return self.av_request(parameters)
 
     def av_request(self, parameters: dict, timeout: int = 5):
