@@ -65,4 +65,5 @@ class fxClient:
 
 if __name__ == '__main__':
     generator = fxClient()
-    print(generator.get_fx_rate(from_currency='JPY'))
+    # print(generator.get_fx_rate(from_currency='AUD'))
+    print(generator.get_batch_fx_rate(from_currencies=['AUD','JPY']))
