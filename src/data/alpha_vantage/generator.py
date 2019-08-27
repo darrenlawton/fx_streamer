@@ -3,16 +3,12 @@
 
 # main: https://github.com/Pmlsa/AlphaVantage/tree/master/AlphaVantage
 # understand this: https://stackoverflow.com/questions/14132789/relative-imports-for-the-billionth-time/14132912#14132912
+# https://urllib3.readthedocs.io/en/latest/user-guide.html#using-timeouts
 
 import json, urllib3
 from multiprocessing.pool import ThreadPool
 from src.data import data_config as dc
 
-
-# # Public Methods
-# def fxrate(self, from_currency: str, to_currency: str = 'USD', **kwargs) -> DataFrame or None:
-#     """Simple wrapper to _av_api_call method for currency requests."""
-#
 
 # def _av_api_call(self, parameters: dict, timeout: int = 60, **kwargs) -> DataFrame or json or None:
 #     """Main method to handle AlphaVantage API call request and response."""
@@ -57,25 +53,35 @@ class fxClient:
     def __init__(self):
         self.session = urllib3.HTTPConnectionPool(dc.AV_HOST)
         self.api_key = dc.validate_key(dc.AV_API_KEY)
-
+        self.av_host = dc.AV_HOST
+        self.av_function = dc.AV_FUNCTION_CALL 
+        
     def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
         payload = {
-            'function': dc.AV_FUNCTION_CALL,
+            'function': self.av_function,
             'from_currency': from_currency.upper(),
             'to_currency': to_currency.upper()
         }
+        result = self.av_request(parameters)
+        return result if result is not None else None
 
-        #     download = self._av_api_call(parameters, **kwargs)
-        #     return download if download is not None else None
+    def av_request(self, parameters: dict, timeout: int = 60):
+        parameters['apikey'] = self.api_key
+        try:
+            response = self.session.request(
+                'GET',  
+                '/query', 
+                fields=parameters,
+                timeout=''
+            )
+        except urllib3.exceptions.NewConnectionError:
+            pass
+        finally:
+            response.close()
 
         return None
 
-    def av_api_request(self):
-
-
-        return None
-
-    def get_fx_batch(self, from_currencies, to_currency):
+    def get_fx_batch(self, from_currencies, to_currency: str = 'USD'):
         """
         threaded request for retrieving multiple
         :param from_currencies: a list of currencies
