@@ -62,4 +62,4 @@ class fxClient:
         response_list = pool.map(self.get_fx_rate, from_currencies)
         pool.close()
         pool.join()
-        return response_listv
+        return response_list
