@@ -6,7 +6,7 @@
 # https://urllib3.readthedocs.io/en/latest/user-guide.html#using-timeouts
 # https://github.com/twopirllc/AlphaVantageAPI/blob/master/alphaVantageAPI/alphavantage.py#L174
 
-import json, itertools
+import itertools
 import requests
 from multiprocessing.pool import ThreadPool
 from src.data import data_config as dc

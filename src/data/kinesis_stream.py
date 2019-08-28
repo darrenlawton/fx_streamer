@@ -4,11 +4,11 @@
 # MAIN: https://github.com/aws-samples/amazon-kinesis-learning/blob/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/writer/StockTradesWriter.java
 # ACCOMPANIED: https://blog.sqreen.com/streaming-data-amazon-kinesis/
 # https://blog.sqreen.com/streaming-data-amazon-kinesis/
+# https://www.influxdata.com/products/influxdb-overview/
 
 import boto3
 import argparse, os, time
-
-VALID_STREAM = 'ACTIVE'
+from src.data import data_config as dc
 
 
 class kinesisStream():
@@ -33,7 +33,7 @@ class kinesisStream():
 
     def validate_stream(self):
         status = None
-        while status != VALID_STREAM:
+        while status != dc.VALID_STREAM:
             try:
                 response = self.client.describe_stream(StreamName=self.stream_name)
                 status = response.get('StreamDescription').get('StreamStatus')
