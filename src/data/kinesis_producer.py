@@ -10,13 +10,34 @@
 
 # REMEMBER THIS HAS TO BE AGNOSTIC TO SOURCE (i.e AV OR IG ETC)
 
+import time
 import threading
 from src.data.alpha_vantage import generator
 
 
-class KinesisProducer(threading.Thread):
-    def __init__(self):
+class kinesisProducer(threading.Thread):
+    def __init__(self, kinesis_client, stream_name, partition_name, stream_freq):
+        self.client = kinesis_client
+        self.stream_name = stream_name
+        self.partition_name = partition_name
+        self.stream_freq = stream_freq
+        super().__init__()
         return None
 
-    def put_record(self):
-        return None
+    def put_record(self, data):
+        self.client.put_record(self.stream_name, data, self.partition_key)
+
+    def stream_data(self, generator_function):
+        """
+        :param generator_function: LAMBDA function i.e. stream_data(lambda: generator_function(#args))
+        :return:
+        """
+        while True:
+            try:
+                data = generator_function()
+                self.put_record(data)
+                time.sleep(self.stream_freq)
+            except Exception:
+                continue
+
+

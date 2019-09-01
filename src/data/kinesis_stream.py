@@ -2,9 +2,6 @@
 # https://github.com/bufferapp/kiner/blob/master/kiner/producer.py
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html
 # MAIN: https://github.com/aws-samples/amazon-kinesis-learning/blob/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/writer/StockTradesWriter.java
-# ACCOMPANIED: https://blog.sqreen.com/streaming-data-amazon-kinesis/
-# https://blog.sqreen.com/streaming-data-amazon-kinesis/
-# https://www.influxdata.com/products/influxdb-overview/
 
 import boto3
 import argparse, os, time
@@ -59,3 +56,4 @@ if __name__ == '__main__':
         kinesis_stream = kinesisStream(stream_name, n_shards, aws_profile)
     else:
         kinesis_stream = kinesisStream(stream_name, n_shards)
+
