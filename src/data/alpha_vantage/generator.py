@@ -16,8 +16,8 @@ class fxClient:
     def __init__(self):
         self.api_key = dc.validate_key(dc.AV_API_KEY)
         self.av_host = dc.AV_HOST
-        self.av_function = dc.AV_FUNCTION_CALL 
-        
+        self.av_function = dc.AV_FUNCTION_CALL
+
     def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
         """
         Fetch realtime exchange rate for given ccy pair
@@ -47,7 +47,8 @@ class fxClient:
 
         if response.status_code == 200:
             return response.json()
-        else: return None
+        else:
+            return None
 
     def get_batch_fx_rate(self, from_currencies, to_currency: str = 'USD'):
         """
@@ -66,4 +67,4 @@ class fxClient:
 if __name__ == '__main__':
     generator = fxClient()
     # print(generator.get_fx_rate(from_currency='AUD'))
-    print(generator.get_batch_fx_rate(from_currencies=['AUD','JPY']))
+    print(generator.get_batch_fx_rate(from_currencies=['AUD', 'JPY']))

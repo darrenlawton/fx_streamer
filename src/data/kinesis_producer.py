@@ -6,11 +6,13 @@
 # https://stackoverflow.com/questions/9815234/how-to-store-7-3-billion-rows-of-market-data-optimized-to-be-read
 # https://ericdraken.com/storing-stock-candle-data-efficiently/
 # https://ericdraken.com/api-challenges-java/
+# http://discretelogics.com/teafiles/#teafilespython
 
 # REMEMBER THIS HAS TO BE AGNOSTIC TO SOURCE (i.e AV OR IG ETC)
 
 import threading
 from src.data.alpha_vantage import generator
+
 
 class KinesisProducer(threading.Thread):
     def __init__(self):
