@@ -18,15 +18,19 @@ class kinesisStream():
     def create_stream(self):
         try:
             self.client.create_stream(StreamName=stream_name, ShardCount=n_shards)
-            self.validate_stream
+        except self.client.exceptions.ResourceInUseException:
+            print('stream {} already exists.'.format(self.stream_name))
+            pass
         except self.client.exceptions as e:
-            print("Unable to create kinesis stream: %s" % e)
+            print('Unable to create kinesis stream: {}'.format(e))
+
+        return self.validate_stream
 
     def terminate_stream(self):
         try:
             self.client.delete_stream(StreamName=stream_name)
         except self.client.exceptions as e:
-            print("Unable to delete kinesis stream: %s" % e)
+            print("Unable to delete kinesis stream: {}".format(e))
 
     def validate_stream(self):
         status = None
@@ -37,8 +41,10 @@ class kinesisStream():
                 time.sleep(1)
             except self.client.exceptions as e:
                 print("Error found while describing the stream: %s" % e)
+                return False
 
         print('kinesis stream active {} '.format(self.stream_name))
+        return True
 
 
 if __name__ == '__main__':
