@@ -25,8 +25,9 @@ class kinesisProducer(threading.Thread):
     def put_record(self, data):
         self.client.put_record(self.stream_name, data, self.partition_key)
 
-    def stream_data(self, generator_function):
+    def run(self, generator_function):
         """
+        Generate list of prices per defined time frequency
         :param generator_function: lambda function i.e. stream_data(lambda: generator_function(#args))
         """
         while True:
@@ -34,7 +35,8 @@ class kinesisProducer(threading.Thread):
                 data = generator_function()
                 self.put_record(data)
                 time.sleep(self.stream_freq)
-            except Exception:
+            except Exception as e:
+                print("Error occurred whilst streaming {}".format(e))
                 continue
 
 

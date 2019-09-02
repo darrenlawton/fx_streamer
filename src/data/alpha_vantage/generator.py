@@ -18,21 +18,6 @@ class fxClient:
         self.av_host = dc.AV_HOST
         self.av_function = dc.AV_FUNCTION_CALL
 
-    def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
-        """
-        Fetch realtime exchange rate for given ccy pair
-        :param from_currency: the ccy to get the exchange rate for
-        :param to_currency: the destination ccy for the exchange rate
-        :returns: realtime quote for ccy pair in json format
-        """
-        parameters = {
-            'function': self.av_function,
-            'from_currency': from_currency.upper(),
-            'to_currency': to_currency.upper()
-        }
-
-        return self.av_request(parameters)
-
     def av_request(self, parameters: dict, timeout: int = 5):
         parameters['apikey'] = self.api_key
         try:
@@ -50,9 +35,24 @@ class fxClient:
         else:
             return None
 
+    def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
+        """
+        fetch realtime fx rate for given ccy pair
+        :param from_currency: the ccy to get the exchange rate for
+        :param to_currency: the destination ccy for the exchange rate
+        :returns: realtime quote for ccy pair in json format
+        """
+        parameters = {
+            'function': self.av_function,
+            'from_currency': from_currency.upper(),
+            'to_currency': to_currency.upper()
+        }
+
+        return self.av_request(parameters)
+
     def get_batch_fx_rate(self, from_currencies, to_currency: str = 'USD'):
         """
-        threaded request for retrieving multiple
+        threaded request for retrieving multiple fx rates
         :param from_currencies: a list of currencies
         :param to_currency: a string being the base currency
         :returns: list fx rates in json format
