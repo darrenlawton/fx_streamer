@@ -33,7 +33,10 @@ class kinesisConsumer:
         response = self.client.get_shard_iterator(self.stream_name, self.shard_id)
 
         try:
-
+            return None
         except Exception as e:
             print("Error occurred whilst consuming stream {}".format(e))
-            continue
+
+
+class dataWriter(kinesisConsumer):
+    raise NotImplemented
