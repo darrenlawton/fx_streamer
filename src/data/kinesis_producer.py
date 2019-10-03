@@ -15,11 +15,11 @@ import threading
 
 
 class kinesisProducer(threading.Thread):
-    def __init__(self, kinesis_client, stream_name, partition_name, stream_freq):
+    def __init__(self, kinesis_client, stream_name, partition_key, stream_freq):
         super().__init__()
         self.client = kinesis_client
         self.stream_name = stream_name
-        self.partition_name = partition_name
+        self.partition_key = partition_key
         self.stream_freq = stream_freq
 
     def put_record(self, data):

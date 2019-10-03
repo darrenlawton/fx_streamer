@@ -5,7 +5,35 @@
 # https://acadgild.com/blog/parquet-file-format-hadoop
 
 # We going to use parquet - https://arrow.apache.org/docs/python/parquet.html
+# CONSUMER https://blog.sqreen.com/streaming-data-amazon-kinesis/
 
 import pyarrow.parquet as pq
 
-# class kinesisConsumer:
+class kinesisConsumer:
+    def __init__(self, kinesis_client, stream_name, shard_id, stream_freq, iterator):
+        super().__init__()
+        self.client = kinesis_client
+        self.stream_name = stream_name
+        self.shard_id = shard_id
+        self.stream_freq = stream_freq
+        self.iterator = iterator
+
+    @staticmethod
+    def iterate_records(records):
+        for r in records:
+            partition_key = r['PartitionKey']
+            data = r['Data']
+
+        yield partition_key, data
+
+    def run(self):
+        """
+        Poll stream for new record and pass to processing method
+        """
+        response = self.client.get_shard_iterator(self.stream_name, self.shard_id)
+
+        try:
+
+        except Exception as e:
+            print("Error occurred whilst consuming stream {}".format(e))
+            continue
