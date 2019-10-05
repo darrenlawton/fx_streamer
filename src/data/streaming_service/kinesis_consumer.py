@@ -4,8 +4,15 @@
 # https://ericdraken.com/comparison-time-series-data-transport-formats/
 # https://acadgild.com/blog/parquet-file-format-hadoop
 
+
+## CURRENT TABS OPEN ###
 # We going to use parquet - https://arrow.apache.org/docs/python/parquet.html
 # CONSUMER https://blog.sqreen.com/streaming-data-amazon-kinesis/
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html#Kinesis.Client.get_records
+#https://docs.aws.amazon.com/streams/latest/dev/tutorial-stock-data-kplkcl-consumer.html
+#https://github.com/aws-samples/amazon-kinesis-learning/tree/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/processor
+#https://medium.com/data-alchemist/how-to-collect-data-for-cryptocurrency-algorithmic-trading-and-what-to-collect-f944d4b1a69
+#https://acadgild.com/blog/parquet-file-format-hadoop
 
 import pyarrow.parquet as pq
 
@@ -38,5 +45,5 @@ class kinesisConsumer:
             print("Error occurred whilst consuming stream {}".format(e))
 
 
-class dataWriter(kinesisConsumer):
+class consumeData(kinesisConsumer):
     raise NotImplemented
