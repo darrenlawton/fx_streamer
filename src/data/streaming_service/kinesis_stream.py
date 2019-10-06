@@ -63,3 +63,4 @@ if __name__ == '__main__':
     else:
         kinesis_stream = kinesisStream(stream_name, n_shards)
 
+    kinesis_stream.create_stream()

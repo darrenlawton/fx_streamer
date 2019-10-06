@@ -10,14 +10,15 @@
 
 # REMEMBER THIS HAS TO BE AGNOSTIC TO SOURCE (i.e AV OR IG ETC)
 
+import boto3
 import time
 import threading
 
 
 class kinesisProducer(threading.Thread):
-    def __init__(self, kinesis_client, stream_name, partition_key, stream_freq):
+    def __init__(self, stream_name, partition_key, stream_freq):
         super().__init__()
-        self.client = kinesis_client
+        self.client = boto3.client('kinesis')
         self.stream_name = stream_name
         self.partition_key = partition_key
         self.stream_freq = stream_freq
@@ -30,6 +31,8 @@ class kinesisProducer(threading.Thread):
         Generate list of prices per defined time frequency
         :param generator_function: lambda function i.e. stream_data(lambda: generator_function(#args))
         """
+        # consider batch method here
+        # https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-sdk.html#kinesis-using-sdk-java-add-data-to-stream
         while True:
             try:
                 data = generator_function()
