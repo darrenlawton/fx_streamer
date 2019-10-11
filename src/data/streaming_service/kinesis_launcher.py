@@ -31,3 +31,8 @@ if __name__ == '__main__':
     producer.run(generator.get_batch_fx_rate(from_currencies=['AUD', 'EUR']))
 
     # Create and run consumer
+    consumer = kinesis_consumer.kinesisConsumer(stream_name)
+    try:
+        consumer.run()
+    finally:
+        kinesis_stream.terminate_stream()

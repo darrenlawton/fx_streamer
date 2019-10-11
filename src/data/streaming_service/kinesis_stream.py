@@ -17,7 +17,7 @@ class kinesisStream():
 
     def create_stream(self):
         try:
-            self.client.create_stream(StreamName=stream_name, ShardCount=n_shards)
+            self.client.create_stream(StreamName=self.stream_name, ShardCount=self.n_shards)
         except self.client.exceptions.ResourceInUseException:
             print('stream {} already exists.'.format(self.stream_name))
             pass
@@ -28,7 +28,7 @@ class kinesisStream():
 
     def terminate_stream(self):
         try:
-            self.client.delete_stream(StreamName=stream_name)
+            self.client.delete_stream(StreamName=self.stream_name)
         except self.client.exceptions as e:
             print("Unable to delete kinesis stream: {}".format(e))
 
