@@ -45,22 +45,3 @@ class kinesisStream():
 
         print('kinesis stream active {} '.format(self.stream_name))
         return True
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Let\'s get streamy.')
-    parser.add_argument('-n', help='Stream name', required=True)
-    parser.add_argument('-s', help='Number of shards', required=True)
-    parser.add_argument('-u', help='AWS profile')
-    args = parser.parse_args()
-
-    stream_name = args.n
-    n_shards = args.s
-    aws_profile = args.u
-
-    if aws_profile:
-        kinesis_stream = kinesisStream(stream_name, n_shards, aws_profile)
-    else:
-        kinesis_stream = kinesisStream(stream_name, n_shards)
-
-    kinesis_stream.create_stream()

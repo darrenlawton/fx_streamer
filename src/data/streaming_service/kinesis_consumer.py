@@ -14,7 +14,7 @@
 
 import boto3
 import time
-import pyarrow.parquet as pq
+
 
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator, stream_freq):
@@ -53,4 +53,5 @@ class kinesisConsumer:
 
 
 class consumeData(kinesisConsumer):
-    raise NotImplemented
+    def process_records(self, records):
+        raise NotImplemented

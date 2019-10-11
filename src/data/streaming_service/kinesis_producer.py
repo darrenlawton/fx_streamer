@@ -16,7 +16,7 @@ import threading
 
 
 class kinesisProducer(threading.Thread):
-    def __init__(self, stream_name, partition_key, stream_freq):
+    def __init__(self, stream_name, partition_key, stream_freq=60):
         super().__init__()
         self.client = boto3.client('kinesis')
         self.stream_name = stream_name
