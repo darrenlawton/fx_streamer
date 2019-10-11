@@ -14,10 +14,10 @@
 
 import boto3
 import time
-
+from src.data import data_config as dc
 
 class kinesisConsumer:
-    def __init__(self, stream_name, shard_id, iterator, stream_freq):
+    def __init__(self, stream_name, shard_id, iterator, stream_freq=dc.CONSUMER_STREAM_FREQ):
         super().__init__()
         self.client = boto3.client('kinesis')
         self.stream_name = stream_name

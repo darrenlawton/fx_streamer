@@ -3,6 +3,7 @@ from src.data.streaming_service import kinesis_producer
 from src.data.streaming_service import kinesis_consumer
 from src.data.alpha_vantage import generator
 import argparse, os, time
+from src.data import data_config as dc
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Let\'s get streamy.')
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     producer.run(generator.get_batch_fx_rate(from_currencies=['AUD', 'EUR']))
 
     # Create and run consumer
-    consumer = kinesis_consumer.kinesisConsumer(stream_name)
+    consumer = kinesis_consumer.kinesisConsumer(stream_name, dc.SHARD_ID, dc.ITERATOR_TYPE)
     try:
         consumer.run()
     finally:

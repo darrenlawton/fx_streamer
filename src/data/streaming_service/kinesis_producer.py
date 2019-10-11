@@ -13,10 +13,10 @@
 import boto3
 import time
 import threading
-
+from src.data import data_config as dc
 
 class kinesisProducer(threading.Thread):
-    def __init__(self, stream_name, partition_key, stream_freq=60):
+    def __init__(self, stream_name, partition_key, stream_freq=dc.PRODUCER_STREAM_FREQ):
         super().__init__()
         self.client = boto3.client('kinesis')
         self.stream_name = stream_name

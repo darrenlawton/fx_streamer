@@ -4,7 +4,7 @@
 # MAIN: https://github.com/aws-samples/amazon-kinesis-learning/blob/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/writer/StockTradesWriter.java
 
 import boto3
-import argparse, os, time
+import os, time
 from src.data import data_config as dc
 
 

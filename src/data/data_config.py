@@ -17,6 +17,10 @@ def validate_key(api_key):
 
 # AWS Kinesis Stream
 VALID_STREAM = 'ACTIVE'
+SHARD_ID = 'shardId-000000000000'
+ITERATOR_TYPE = 'TRIM_HORIZON'
+PRODUCER_STREAM_FREQ = 60
+CONSUMER_STREAM_FREQ = 60*60
 
 
 # Autoencoder
