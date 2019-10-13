@@ -1,3 +1,3 @@
-# trading_bot
+# Alpha Vantage Streaming Service
 
-A trading agent using RL. Specifically, we aim to train an agent to behave as a rational, risk averse trader.
+Implementation of a streaming service for FX prices (to USD) from Alpha Vantage. Data to be stored in InfluxDB, a time-series database. 
