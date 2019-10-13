@@ -6,10 +6,14 @@
 # https://urllib3.readthedocs.io/en/latest/user-guide.html#using-timeouts
 # https://github.com/twopirllc/AlphaVantageAPI/blob/master/alphaVantageAPI/alphavantage.py#L174
 
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import itertools
 import requests
 from multiprocessing.pool import ThreadPool
-from src.data import data_config as dc
+import data_config as dc
 
 
 class fxClient:
@@ -68,3 +72,4 @@ if __name__ == '__main__':
     generator = fxClient()
     # print(generator.get_fx_rate(from_currency='AUD'))
     print(generator.get_batch_fx_rate(from_currencies=['AUD', 'EUR']))
+

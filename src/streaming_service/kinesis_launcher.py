@@ -1,9 +1,14 @@
-from src.data.streaming_service import kinesis_stream
-from src.data.streaming_service import kinesis_producer
-from src.data.streaming_service import kinesis_consumer
-from src.data.alpha_vantage import generator
-import argparse, os, time
-from src.data import data_config as dc
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from streaming_service import kinesis_stream
+from streaming_service import kinesis_producer
+from streaming_service import kinesis_consumer
+from alpha_vantage import generator
+
+import argparse
+import data_config as dc
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Let\'s get streamy.')

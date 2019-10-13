@@ -2,10 +2,13 @@
 # https://github.com/bufferapp/kiner/blob/master/kiner/producer.py
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html
 # MAIN: https://github.com/aws-samples/amazon-kinesis-learning/blob/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/writer/StockTradesWriter.java
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import boto3
 import os, time
-from src.data import data_config as dc
+import data_config as dc
 
 
 class kinesisStream():

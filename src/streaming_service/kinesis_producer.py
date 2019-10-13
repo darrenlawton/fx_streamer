@@ -9,11 +9,15 @@
 # http://discretelogics.com/teafiles/#teafilespython
 
 # REMEMBER THIS HAS TO BE AGNOSTIC TO SOURCE (i.e AV OR IG ETC)
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import boto3
 import time
 import threading
-from src.data import data_config as dc
+import data_config as dc
+
 
 class kinesisProducer(threading.Thread):
     def __init__(self, stream_name, partition_key, stream_freq=dc.PRODUCER_STREAM_FREQ):
