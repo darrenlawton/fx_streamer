@@ -58,4 +58,4 @@ class kinesisConsumer:
 
 class consumeData(kinesisConsumer):
     def process_records(self, records):
-        raise NotImplemented
+        print(records)

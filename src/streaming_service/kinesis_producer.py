@@ -15,6 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import boto3
 import time
+import datetime
 import threading
 import data_config as dc
 
@@ -25,21 +26,23 @@ class kinesisProducer(threading.Thread):
         self.client = boto3.client('kinesis')
         self.stream_name = stream_name
         self.partition_key = partition_key
-        self.stream_freq = stream_freq
+        self.stream_freq = int(stream_freq)
 
     def put_record(self, data):
-        self.client.put_record(self.stream_name, data, self.partition_key)
+        self.client.put_record(StreamName=self.stream_name, Data=data, PartitionKey=self.partition_key)
 
-    def run(self, generator_function):
+    def run(self, generator_function, from_fx_pairs):
         """
         Generate list of prices per defined time frequency
         :param generator_function: lambda function i.e. stream_data(lambda: generator_function(#args))
         """
         # consider batch method here
         # https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-sdk.html#kinesis-using-sdk-java-add-data-to-stream
+
         while True:
             try:
-                data = generator_function()
+                print(datetime.datetime.now())
+                data = generator_function(from_fx_pairs)
                 self.put_record(data)
                 time.sleep(self.stream_freq)
             except Exception as e:
