@@ -1,7 +1,3 @@
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from streaming_service import kinesis_stream
 from streaming_service import kinesis_producer
 from streaming_service import kinesis_consumer
