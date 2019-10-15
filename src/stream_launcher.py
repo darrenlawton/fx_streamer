@@ -7,6 +7,7 @@ import argparse
 import data_config as dc
 
 # threading: https://dzone.com/articles/python-thread-part-1
+# also see multiprocessing
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Let\'s get streamy.')

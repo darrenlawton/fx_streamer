@@ -29,6 +29,7 @@ class kinesisProducer(threading.Thread):
         self.stream_freq = int(stream_freq)
 
     def put_record(self, data):
+        # Need to transform data to required type
         self.client.put_record(StreamName=self.stream_name, Data=data, PartitionKey=self.partition_key)
 
     def run(self, generator_function, from_fx_pairs):
