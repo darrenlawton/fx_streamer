@@ -11,12 +11,13 @@
 # REMEMBER THIS HAS TO BE AGNOSTIC TO SOURCE (i.e AV OR IG ETC)
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import boto3
-import time
-import datetime
+import time, datetime
 import threading
+import pickle
 import data_config as dc
 
 
@@ -29,8 +30,8 @@ class kinesisProducer(threading.Thread):
         self.stream_freq = int(stream_freq)
 
     def put_record(self, data):
-        # Need to transform data to required type
-        self.client.put_record(StreamName=self.stream_name, Data=data, PartitionKey=self.partition_key)
+        self.client.put_record(StreamName=self.stream_name, Data=pickle.dumps(data), PartitionKey=self.partition_key)
+        print("Put record at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def run(self, generator_function, from_fx_pairs):
         """
@@ -42,7 +43,6 @@ class kinesisProducer(threading.Thread):
 
         while True:
             try:
-                print(datetime.datetime.now())
                 data = generator_function(from_fx_pairs)
                 self.put_record(data)
                 time.sleep(self.stream_freq)

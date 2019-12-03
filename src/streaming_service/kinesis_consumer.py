@@ -16,7 +16,8 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import boto3
-import time
+import time, datetime
+import pickle
 import data_config as dc
 
 
@@ -59,3 +60,8 @@ class kinesisConsumer:
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         print(records)
+
+        # Deserialise record
+
+        # Ensure each blob is a list type
+
