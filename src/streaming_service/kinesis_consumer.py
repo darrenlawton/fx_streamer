@@ -42,12 +42,14 @@ class kinesisConsumer:
         """
         Poll stream for new record and pass to processing method
         """
-        response = self.client.get_shard_iterator(self.stream_name, self.shard_id, self.iterator)
+        response = self.client.get_shard_iterator(StreamName=self.stream_name,
+                                                  ShardId=self.shard_id,
+                                                  ShardIteratorType=self.iterator)
         iteration = response['ShardIterator']
 
         while True:
             try:
-                response = self.kinesis_client(iteration, limit=60)
+                response = self.client.get_records(ShardIterator=iteration)
                 records = response['Records']
                 if records:
                     self.process_records(records)

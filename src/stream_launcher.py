@@ -4,10 +4,23 @@ from streaming_service import kinesis_consumer
 from alpha_vantage import generator
 
 import argparse
+import multiprocessing
+import time
 import data_config as dc
 
-# threading: https://dzone.com/articles/python-thread-part-1
-# also see multiprocessing
+
+def trigger_producer(stream_name, partition_key, fx_generator):
+    # Create and run producer. Need to also define generator function for run method.
+    producer = kinesis_producer.kinesisProducer(stream_name, partition_key)
+    producer.run(fx_generator.get_batch_fx_rate, ['AUD', 'EUR'])
+
+
+def trigger_consumer(stream_name):
+    # Create and run consumer
+    print("On to consumer")
+    consumer = kinesis_consumer.consumeData(stream_name, dc.SHARD_ID, dc.ITERATOR_TYPE)
+    consumer.run()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Let\'s get streamy.')
@@ -17,28 +30,22 @@ if __name__ == '__main__':
     parser.add_argument('-u', help='AWS profile')
     args = parser.parse_args()
 
-    stream_name = args.n
-    partition_key = args.p
+    input_stream_name = args.n
+    input_partition_key = args.p
     n_shards = int(args.s)
     aws_profile = args.u
 
     # Create kinesis stream
     if aws_profile:
-        kinesis_stream = kinesis_stream.kinesisStream(stream_name, n_shards, aws_profile)
+        kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards, aws_profile)
     else:
-        kinesis_stream = kinesis_stream.kinesisStream(stream_name, n_shards)
+        kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards)
 
     kinesis_stream.create_stream()
 
-    # Create and run producer. Need to also define generator function for run method.
-    producer = kinesis_producer.kinesisProducer(stream_name, partition_key)
-    generator = generator.fxClient()
-    producer.run(generator.get_batch_fx_rate, ['AUD', 'EUR'])
+    prod = multiprocessing.Process(name='producer', target=trigger_producer, args=(input_stream_name, input_partition_key, generator.fxClient()))
+    cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name,))
 
-    # Create and run consumer
-    print("on to consumer")
-    consumer = kinesis_consumer.kinesisConsumer(stream_name, dc.SHARD_ID, dc.ITERATOR_TYPE)
-    try:
-        consumer.run()
-    finally:
-        kinesis_stream.terminate_stream()
+    prod.start()
+    time.sleep(dc.CONSUMER_STREAM_FREQ-1)
+    cons.start()
