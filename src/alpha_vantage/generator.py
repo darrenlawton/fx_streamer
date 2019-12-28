@@ -31,7 +31,7 @@ class fxClient:
                 timeout=timeout
             )
         except requests.exceptions.RequestException as e:
-            print('Alpha vantage api connection failed: {e}')
+            print('Alpha vantage api connection failed: {}'.format(e))
             pass
 
         if response.status_code == 200:

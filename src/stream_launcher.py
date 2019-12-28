@@ -5,7 +5,7 @@ from alpha_vantage import generator
 
 import argparse
 import multiprocessing
-import time
+import time, datetime
 import data_config as dc
 
 
@@ -17,7 +17,6 @@ def trigger_producer(stream_name, partition_key, fx_generator):
 
 def trigger_consumer(stream_name):
     # Create and run consumer
-    print("On to consumer")
     consumer = kinesis_consumer.consumeData(stream_name, dc.SHARD_ID, dc.ITERATOR_TYPE)
     consumer.run()
 
@@ -41,11 +40,13 @@ if __name__ == '__main__':
     else:
         kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards)
 
-    kinesis_stream.create_stream()
+    if kinesis_stream.create_stream():
+        print("stream created!")
+        prod = multiprocessing.Process(name='producer', target=trigger_producer, args=(input_stream_name, input_partition_key, generator.fxClient()))
+        cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name,))
 
-    prod = multiprocessing.Process(name='producer', target=trigger_producer, args=(input_stream_name, input_partition_key, generator.fxClient()))
-    cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name,))
-
-    prod.start()
-    time.sleep(dc.CONSUMER_STREAM_FREQ-1)
-    cons.start()
+        prod.start()
+        print("Producer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        time.sleep(30)
+        cons.start()
+        print("Consumer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
