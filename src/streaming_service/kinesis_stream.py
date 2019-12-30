@@ -27,22 +27,24 @@ class kinesisStream():
         except self.client.exceptions as e:
             print('Unable to create kinesis stream: {}'.format(e))
 
-        return self.validate_stream
+        return self.validate_stream()
 
     def terminate_stream(self):
         try:
             self.client.delete_stream(StreamName=self.stream_name)
-        except self.client.exceptions as e:
+        except Exception as e:
             print("Unable to delete kinesis stream: {}".format(e))
 
     def validate_stream(self):
-        status = None
+        status = ""
+
         while status != dc.VALID_STREAM:
+            print(status)
             try:
                 response = self.client.describe_stream(StreamName=self.stream_name)
                 status = response.get('StreamDescription').get('StreamStatus')
                 time.sleep(1)
-            except self.client.exceptions as e:
+            except Exception as e:
                 print("Error found while describing the stream: %s" % e)
                 return False
 

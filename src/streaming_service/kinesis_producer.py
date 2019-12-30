@@ -33,21 +33,23 @@ class kinesisProducer(threading.Thread):
         self.client.put_record(StreamName=self.stream_name, Data=pickle.dumps(data), PartitionKey=self.partition_key)
         print("Put record at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    def run(self, generator_function, from_fx_pairs):
+    def run(self, generator_function, from_fx_pairs, event):
         """
         Generate list of prices per defined time frequency
         :param generator_function: lambda function i.e. stream_data(lambda: generator_function(#args))
         """
-        # consider batch method here
-        # https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-sdk.html#kinesis-using-sdk-java-add-data-to-stream
-
         while True:
             try:
                 data = generator_function(from_fx_pairs)
                 self.put_record(data)
                 time.sleep(self.stream_freq)
+            except self.client.exceptions.ResourceNotFoundException:
+                event.set()
+                print("Stream not found. Terminating processes")
+                break
             except Exception as e:
                 print("Error occurred whilst streaming {}".format(e))
                 continue
+
 
 

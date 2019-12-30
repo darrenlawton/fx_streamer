@@ -4,13 +4,12 @@
 # https://ericdraken.com/comparison-time-series-data-transport-formats/
 # https://acadgild.com/blog/parquet-file-format-hadoop
 
-
-## CURRENT TABS OPEN ###
 # We going to use parquet - https://arrow.apache.org/docs/python/parquet.html
 # CONSUMER https://blog.sqreen.com/streaming-data-amazon-kinesis/
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html#Kinesis.Client.get_records
 # https://docs.aws.amazon.com/streams/latest/dev/tutorial-stock-data-kplkcl-consumer.html
 # https://github.com/aws-samples/amazon-kinesis-learning/tree/learning-module-1/src/com/amazonaws/services/kinesis/samples/stocktrades/processor
+
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,7 +37,7 @@ class kinesisConsumer:
 
         yield partition_key, data
 
-    def run(self):
+    def run(self, event):
         """
         Poll stream for new record and pass to processing method
         """
@@ -46,10 +45,8 @@ class kinesisConsumer:
                                                   ShardId=self.shard_id,
                                                   ShardIteratorType=self.iterator)
         iteration = response['ShardIterator']
-        start = datetime.datetime.now()
-        end = start + datetime.timedelta(seconds=self.stream_freq)
 
-        while True:
+        while not event.is_set():
             try:
                 response = self.client.get_records(ShardIterator=iteration)
                 records = response['Records']
@@ -64,54 +61,9 @@ class kinesisConsumer:
                 print("Error occurred whilst consuming stream {}".format(e))
                 time.sleep(1)
 
+        print("Consumer terminated.")
 
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
             print(partition_key, ":", data_blob)
-
-        # Error
-        # occurred
-        # whilst
-        # consuming
-        # stream
-        # An
-        # error
-        # occurred(ExpiredIteratorException)
-        # when
-        # calling
-        # the
-        # GetRecords
-        # operation: Iterator
-        # expired.The
-        # iterator
-        # was
-        # created
-        # at
-        # time
-        # Sun
-        # Dec
-        # 0
-        # 8
-        # 11: 40:31
-        # UTC
-        # 2019
-        # while right now it is Sun Dec 08 11:45: 40
-        # UTC
-        # 2019
-        # which is further in the
-        # future
-        # than
-        # the
-        # tolerated
-        # delay
-        # of
-        # 300000
-        # milliseconds.
-
-        # Deserialise record
-
-        # Ensure each blob is a list type
-
-        # for part_key, data in self.iter_records(records):
-            # print(part_key, ":", data)
