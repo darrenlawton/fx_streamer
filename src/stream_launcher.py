@@ -10,10 +10,12 @@ import data_config as dc
 
 # python3.6 src/stream_launcher.py -n "test" -p  "test" -s 1
 # READ: https://www.cloudcity.io/blog/2019/02/27/things-i-wish-they-told-me-about-multiprocessing-in-python/
+
+
 def trigger_producer(stream_name, partition_key, fx_generator, event):
     # Create and run producer. Need to also define generator function for run method.
     producer = kinesis_producer.kinesisProducer(stream_name, partition_key)
-    producer.run(fx_generator.get_batch_fx_rate, ['AUD', 'EUR'], event)
+    producer.run(fx_generator.get_batch_fx_rate, dc.AV_FX_FROM, event)
 
 
 def trigger_consumer(stream_name, event):
@@ -48,7 +50,7 @@ if __name__ == '__main__':
 
         prod.start()
         print("Producer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        time.sleep(30)
+        time.sleep(5)
         cons.start()
         print("Consumer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 

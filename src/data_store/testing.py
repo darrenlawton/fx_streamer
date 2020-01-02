@@ -1,19 +1,15 @@
 from multiprocessing import Process
 import os
 
-def info(title):
-    print (title)
-    print ('module name:', __name__)
-    if hasattr(os, 'getppid'):  # only available on Unix
-        print ('parent process:', os.getppid())
-    print ('process id:', os.getpid())
+# https://medium.com/@bufan.zeng/use-parquet-for-big-data-storage-3b6292598653
+# https://arrow.apache.org/docs/python/parquet.html
+# https://xcalar.com/documentation/help/XD/1.4.0/Content/C_AdvancedTasks/M_Working%20with%20Parquet%20Files.htm
 
-def f(name):
-    info('function f')
-    print ('hello', name)
+# IMPORTANT : https://stackoverflow.com/questions/45082832/how-to-read-partitioned-parquet-files-from-s3-using-pyarrow-in-python
+                # https://stackoverflow.com/questions/49085686/pyarrow-s3fs-partition-by-timestamp
+
+import pyarrow.parquet as pq
+from multiprocessing import Process, cpu_count
 
 if __name__ == '__main__':
-    info('main line')
-    p = Process(target=f, args=('bob',))
-    p.start()
-    #p.join()
+    print(cpu_count())

@@ -63,6 +63,7 @@ class kinesisConsumer:
 
         print("Consumer terminated.")
 
+
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
