@@ -18,7 +18,7 @@ import boto3
 import time, datetime
 import pickle
 import data_config as dc
-
+import data_store.writer as ds
 
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator, stream_freq=dc.CONSUMER_STREAM_FREQ):
@@ -67,4 +67,4 @@ class kinesisConsumer:
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
-            print(partition_key, ":", data_blob)
+            [ds.dict_to_table(i) for i in data_blob]

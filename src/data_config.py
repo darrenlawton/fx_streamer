@@ -23,4 +23,8 @@ PRODUCER_STREAM_FREQ = 60 * 2.5 # shard iterator expires after 5 minutes
 CONSUMER_STREAM_FREQ = PRODUCER_STREAM_FREQ
 
 
+# AWS S3
+BUCKET = 'lawtoninvestmentco'
+
+
 # Autoencoder
