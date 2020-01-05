@@ -8,9 +8,6 @@ import multiprocessing
 import time, datetime
 import data_config as dc
 
-# python3.6 src/stream_launcher.py -n "test" -p  "test" -s 1
-# READ: https://www.cloudcity.io/blog/2019/02/27/things-i-wish-they-told-me-about-multiprocessing-in-python/
-
 
 def trigger_producer(stream_name, partition_key, fx_generator, event):
     # Create and run producer. Need to also define generator function for run method.
@@ -22,6 +19,12 @@ def trigger_consumer(stream_name, event):
     # Create and run consumer
     consumer = kinesis_consumer.consumeData(stream_name, dc.SHARD_ID, dc.ITERATOR_TYPE)
     consumer.run(event)
+
+
+def start_process(process_obj):
+    if isinstance(process_obj, multiprocessing.context.Process):
+        process_obj.start()
+        print(process_obj.name + " process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
 if __name__ == '__main__':
@@ -45,14 +48,15 @@ if __name__ == '__main__':
 
     if kinesis_stream.create_stream():
         e = multiprocessing.Event()
-        prod = multiprocessing.Process(name='producer', target=trigger_producer, args=(input_stream_name, input_partition_key, generator.fxClient(), e))
+        prod = multiprocessing.Process(name='producer', target=trigger_producer,
+                                       args=(input_stream_name, input_partition_key, generator.fxClient(), e))
         cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name, e))
 
-        prod.start()
-        print("Producer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        start_process(prod)
         time.sleep(5)
-        cons.start()
-        print("Consumer process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        start_process(cons)
 
-        prod.join(),cons.join()
+        prod.join(), cons.join()
         kinesis_stream.terminate_stream()
+
+# python3.6 src/stream_launcher.py -n "test" -p  "test" -s 1

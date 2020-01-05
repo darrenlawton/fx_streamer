@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import boto3
 import os, time
 import data_config as dc
-
+from botocore.exceptions import ClientError
 
 class kinesisStream():
     def __init__(self, stream_name, n_shards, aws_profile='default'):
@@ -24,7 +24,7 @@ class kinesisStream():
         except self.client.exceptions.ResourceInUseException:
             print('stream {} already exists.'.format(self.stream_name))
             pass
-        except self.client.exceptions as e:
+        except ClientError as e:
             print('Unable to create kinesis stream: {}'.format(e))
 
         return self.validate_stream()
@@ -32,7 +32,7 @@ class kinesisStream():
     def terminate_stream(self):
         try:
             self.client.delete_stream(StreamName=self.stream_name)
-        except Exception as e:
+        except ClientError as e:
             print("Unable to delete kinesis stream: {}".format(e))
 
     def validate_stream(self):
@@ -44,9 +44,10 @@ class kinesisStream():
                 response = self.client.describe_stream(StreamName=self.stream_name)
                 status = response.get('StreamDescription').get('StreamStatus')
                 time.sleep(1)
-            except Exception as e:
+            except ClientError as e:
                 print("Error found while describing the stream: %s" % e)
                 return False
 
         print('kinesis stream active {} '.format(self.stream_name))
         return True
+

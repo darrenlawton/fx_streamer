@@ -19,7 +19,7 @@ import time, datetime
 import threading
 import pickle
 import data_config as dc
-
+from botocore.exceptions import ClientError
 
 class kinesisProducer(threading.Thread):
     def __init__(self, stream_name, partition_key, stream_freq=dc.PRODUCER_STREAM_FREQ):
@@ -47,7 +47,7 @@ class kinesisProducer(threading.Thread):
                 event.set()
                 print("Stream not found. Terminating processes")
                 break
-            except Exception as e:
+            except ClientError as e:
                 print("Error occurred whilst streaming {}".format(e))
                 continue
 

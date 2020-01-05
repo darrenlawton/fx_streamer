@@ -19,6 +19,7 @@ import time, datetime
 import pickle
 import data_config as dc
 import data_store.writer as ds
+from botocore.exceptions import ClientError
 
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator, stream_freq=dc.CONSUMER_STREAM_FREQ):
@@ -57,7 +58,7 @@ class kinesisConsumer:
 
                 time.sleep(self.stream_freq)
 
-            except Exception as e:
+            except ClientError as e:
                 print("Error occurred whilst consuming stream {}".format(e))
                 time.sleep(1)
 
