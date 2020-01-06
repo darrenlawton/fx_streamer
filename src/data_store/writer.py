@@ -27,16 +27,14 @@ def dict_to_table(dict_blob):
     :param: data blob as dict
     :return: a parquet table
     """
-    global writer, test_count
-
     df = transform_to_df(dict_blob)
     if df is not None:
         return pa.Table.from_pandas(df)
 
 
 def write_to_parquet(writer, table):
-    if writer is None:
-        writer = pq.ParquetWriter('test.parquet', table.schema)
+    # if writer is None:
+    #     writer = pq.ParquetWriter('test.parquet', table.schema)
     writer.write_table(table=table)
     return writer
 
@@ -54,18 +52,23 @@ def transform_to_df(dict_blob):
 
 def get_writer(dict_blob):
     global dict_writer
+    writer = None
 
     # dict keys naming convention: fxpair_date, value will be writer object
     if isinstance(dict_blob, dict):
         fx_pair = dict_blob['1. From_Currency Code']
         refresh_date = datetime.strptime(dict_blob['6. Last Refreshed'], '%Y/%m/%d %H:%M:%S').
 
-        for key in dict_writer.keys():
-            fx_key = key.split("_")[0]
+        key_list = [*dict_writer]
+        writer_key = next((f for f in key_list if fx_pair in f), None)
 
-            if fx_key == fx_pair:
-                # check refresh date against file
-                # if day after write date, close write and open new object
+        if writer_key:
+            writer_date = writer_key.split('_')[1]
+            # check refresh date against file
+            # if day after write date, close writer, remove from dict and open new object/add to dict
+            # can use decorator for adding/remomving dict
+        else:
+            # create whole new writer>
 
     return writer
 
