@@ -13,31 +13,25 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-examples.html
 # Continued writing: https://github.com/apache/arrow/issues/3203
 
+from datetime import datetime
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-writer = None
 dict_writer = {}
 
 
 def dict_to_table(dict_blob):
     """ Convert dictionary to table
 
-    :param: Data blob as dict
-    :return: A parquet table
+    :param: data blob as dict
+    :return: a parquet table
     """
     global writer, test_count
 
     df = transform_to_df(dict_blob)
-
     if df is not None:
-        table = pa.Table.from_pandas(df)
-        # writer = write_to_parquet(writer, table)
-        test_count += 1
-        if test_count > 6:
-            writer.close()
-            print("writer closed")
+        return pa.Table.from_pandas(df)
 
 
 def write_to_parquet(writer, table):
@@ -58,9 +52,31 @@ def transform_to_df(dict_blob):
         return None
 
 
-def get_writer(df_blob):
+def get_writer(dict_blob):
     global dict_writer
+
+    # dict keys naming convention: fxpair_date, value will be writer object
+    if isinstance(dict_blob, dict):
+        fx_pair = dict_blob['1. From_Currency Code']
+        refresh_date = datetime.strptime(dict_blob['6. Last Refreshed'], '%Y/%m/%d %H:%M:%S').
+
+        for key in dict_writer.keys():
+            fx_key = key.split("_")[0]
+
+            if fx_key == fx_pair:
+                # check refresh date against file
+                # if day after write date, close write and open new object
+
     return writer
+
+
+def create_writer():
+    raise NotImplementedError
+
+
+def process_date():
+    # if existing date (if any), doesn't match blob, then close file.
+    raise NotImplementedError
 
 
 def get_file_name():
@@ -73,3 +89,9 @@ if __name__ == '__main__':
     p['6. Last Refreshed'] = pd.to_datetime(p['6. Last Refreshed'])
     p = p.set_index('6. Last Refreshed')
     print(p.columns)
+
+# # writer = write_to_parquet(writer, table)
+# test_count += 1
+# if test_count > 6:
+#     writer.close()
+#     print("writer closed")
