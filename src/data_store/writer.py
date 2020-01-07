@@ -22,6 +22,7 @@ dict_writer = {}
 
 
 def write_to_parquet(dict_blob):
+    print(dict_blob)
     table = dict_to_table(dict_blob)
     writer = get_writer(dict_blob, table)
     if writer:
@@ -57,17 +58,18 @@ def register_writer(file_name, dtable):
     global dict_writer
     writer = pq.ParquetWriter(file_name + '.parquet', dtable.schema)
     dict_writer[file_name] = writer
+    print(file_name + " now registered")
     return writer
 
 
 def deregister_writer(file_name, old_writer):
     global dict_writer
-    if deregister_writer:
-        old_writer.close()
-        try:
-            del dict_writer[file_name]
-        except:
-            print(file_name + " could not be removed from the writer registry.")
+    old_writer.close()
+    try:
+        del dict_writer[file_name]
+        print(file_name + " now deregistered")
+    except:
+        print(file_name + " could not remove from the writer registry.")
 
 
 def get_file_name(fx_pair, refresh_date):
@@ -85,14 +87,18 @@ def get_writer(dict_blob, table):
 
         key_list = [*dict_writer]
         writer_key = next((f for f in key_list if fx_pair in f), None)
-
+        print("checking writer")
         if writer_key:
+            print("found writer key")
             writer_date = datetime.strptime(writer_key.split('_')[1], '%d%m%Y')
+            print("writer date: " + str(writer_date.date()))
+            print("refresh date: " + str(refresh_date.date()))
+
             if writer_date.date() == refresh_date.date():
                 writer = dict_writer[writer_key]
             elif writer_date.date() < refresh_date.date():
                 deregister_writer(writer_key, dict_writer[writer_key])
-                writer = register_writer(get_file_name(fx_pair, refresh_date),table,dict_writer[writer_key])
+                writer = register_writer(get_file_name(fx_pair, refresh_date),table)
         else:
             # create whole new writer
             writer = register_writer(get_file_name(fx_pair, refresh_date), table)
