@@ -1,13 +1,13 @@
 FROM python:3.6
 
-WORKDIR /app
+WORKDIR /src
 
 RUN apt-get update
 
 COPY requirements.txt /app
 RUN pip3 install --upgrade pip -r requirements.txt
 
-COPY . /app
+COPY . /src
 
 CMD [ "python3.6", "/app/src/alpha_vantage/generator.py" ]
 

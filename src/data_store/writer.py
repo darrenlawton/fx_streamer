@@ -21,6 +21,14 @@ import pyarrow.parquet as pq
 dict_writer = {}
 
 
+def write_to_parquet(dict_blob):
+    table = dict_to_table(dict_blob)
+    writer = get_writer(dict_blob, table)
+    if writer:
+        writer.write_table(table=table)
+        print("Written to parquet file.")
+
+
 def dict_to_table(dict_blob):
     """ Convert dictionary to table
 
@@ -32,17 +40,10 @@ def dict_to_table(dict_blob):
         return pa.Table.from_pandas(df)
 
 
-def write_to_parquet(writer, table):
-    # if writer is None:
-    #     writer = pq.ParquetWriter('test.parquet', table.schema)
-    writer.write_table(table=table)
-    return writer
-
-
 def transform_to_df(dict_blob):
     if isinstance(dict_blob, dict):
         # Convert dict to df
-        df = pd.DataFrame.from_dict(dict_blob).transpose()
+        df = pd.DataFrame.from_dict(dict_blob, orient='index').transpose()
         df['6. Last Refreshed'] = pd.to_datetime(df['6. Last Refreshed'])
         df = df.set_index('6. Last Refreshed')
         return df
@@ -50,31 +51,53 @@ def transform_to_df(dict_blob):
         return None
 
 
-def get_writer(dict_blob):
+def register_writer(file_name, dtable):
+    # need to register in dict, and remove anything already there
+    # close existing writer
+    global dict_writer
+    writer = pq.ParquetWriter(file_name + '.parquet', dtable.schema)
+    dict_writer[file_name] = writer
+    return writer
+
+
+def deregister_writer(file_name, old_writer):
+    global dict_writer
+    if deregister_writer:
+        old_writer.close()
+        try:
+            del dict_writer[file_name]
+        except:
+            print(file_name + " could not be removed from the writer registry.")
+
+
+def get_file_name(fx_pair, refresh_date):
+    return fx_pair + "_" + format(refresh_date, '%d%m%Y')
+
+
+def get_writer(dict_blob, table):
     global dict_writer
     writer = None
 
     # dict keys naming convention: fxpair_date, value will be writer object
     if isinstance(dict_blob, dict):
         fx_pair = dict_blob['1. From_Currency Code']
-        refresh_date = datetime.strptime(dict_blob['6. Last Refreshed'], '%Y/%m/%d %H:%M:%S').
+        refresh_date = datetime.strptime(dict_blob['6. Last Refreshed'], '%Y-%m-%d %H:%M:%S')
 
         key_list = [*dict_writer]
         writer_key = next((f for f in key_list if fx_pair in f), None)
 
         if writer_key:
-            writer_date = writer_key.split('_')[1]
-            # check refresh date against file
-            # if day after write date, close writer, remove from dict and open new object/add to dict
-            # can use decorator for adding/remomving dict
+            writer_date = datetime.strptime(writer_key.split('_')[1], '%d%m%Y')
+            if writer_date.date() == refresh_date.date():
+                writer = dict_writer[writer_key]
+            elif writer_date.date() < refresh_date.date():
+                deregister_writer(writer_key, dict_writer[writer_key])
+                writer = register_writer(get_file_name(fx_pair, refresh_date),table,dict_writer[writer_key])
         else:
-            # create whole new writer>
+            # create whole new writer
+            writer = register_writer(get_file_name(fx_pair, refresh_date), table)
 
     return writer
-
-
-def create_writer():
-    raise NotImplementedError
 
 
 def process_date():
@@ -82,19 +105,8 @@ def process_date():
     raise NotImplementedError
 
 
-def get_file_name():
-    raise NotImplementedError
-
-
 if __name__ == '__main__':
-    t = pq.read_table('test.parquet')
+    t = pq.read_table('EUR_07012020.parquet')
     p = t.to_pandas()
-    p['6. Last Refreshed'] = pd.to_datetime(p['6. Last Refreshed'])
-    p = p.set_index('6. Last Refreshed')
-    print(p.columns)
+    print(p)
 
-# # writer = write_to_parquet(writer, table)
-# test_count += 1
-# if test_count > 6:
-#     writer.close()
-#     print("writer closed")

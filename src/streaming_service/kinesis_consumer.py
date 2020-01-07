@@ -68,4 +68,4 @@ class kinesisConsumer:
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
-            [ds.dict_to_table(i) for i in data_blob]
+            [ds.write_to_parquet(i['Realtime Currency Exchange Rate']) for i in data_blob]
