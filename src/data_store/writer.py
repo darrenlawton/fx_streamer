@@ -17,6 +17,8 @@ from datetime import datetime
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+import data_store.s3_interface as s3
+import data_config as dc
 
 dict_writer = {}
 
@@ -31,6 +33,7 @@ def write_to_parquet(dict_blob):
             print("Written to parquet file.")
     except:
         [deregister_writer(key) for key in dict_writer.keys()]
+        print("parquet file writer exception.")
         pass
 
 
@@ -58,7 +61,8 @@ def transform_to_df(dict_blob):
 
 def register_writer(new_key, dtable):
     global dict_writer
-    writer = pq.ParquetWriter(new_key + '.parquet', dtable.schema)
+    # writer = pq.ParquetWriter('local_temp/' + new_key + '.parquet', dtable.schema)
+    writer = pq.ParquetWriter('src/data_store/local_temp/' + new_key + '.parquet', dtable.schema)
     dict_writer[new_key] = writer
     print(new_key + " now registered")
     return writer
@@ -66,7 +70,16 @@ def register_writer(new_key, dtable):
 
 def deregister_writer(key):
     global dict_writer
+    # close parquet writer
     dict_writer[key].close()
+
+    # transfer parquet file from local FS to S3
+    fx_pair = file_date = key.split('_')[0]
+    file_date = datetime.strptime(key.split('_')[1], '%d%m%Y')
+    if s3.upload_file('src/data_store/local_temp/' + key + '.parquet', dc.BUCKET, s3.get_object_name(key, fx_pair, file_date)):
+        os.remove('src/data_store/local_temp/' + key + '.parquet')
+
+    # remove writer from dictionary registry
     try:
         del dict_writer[key]
         print(key + " now deregistered")
@@ -108,6 +121,6 @@ def get_writer(dict_blob, table):
 
 
 if __name__ == '__main__':
-    t = pq.read_table('EUR_07012020.parquet', use_threads=True)
+    t = pq.read_table('local_temp/EUR_07012020.parquet', use_threads=True)
     p = t.to_pandas()
     print(p)

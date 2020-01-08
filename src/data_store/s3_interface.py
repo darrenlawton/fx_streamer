@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import logging
 import boto3
 from botocore.exceptions import ClientError
@@ -29,3 +32,9 @@ def upload_file(file_name, bucket, object_name=None):
         return False
 
     return True
+
+
+def get_object_name(key, fx_pair, stream_date):
+    return "/".join([fx_pair,stream_date.year,stream_date.month,stream_date.day,key])
+
+
