@@ -30,7 +30,7 @@ def write_to_parquet(dict_blob):
             writer.write_table(table=table)
             print("Written to parquet file.")
     except:
-        # need to close all writer objects
+        [deregister_writer(key) for key in dict_writer.keys()]
         pass
 
 
@@ -56,24 +56,22 @@ def transform_to_df(dict_blob):
         return None
 
 
-def register_writer(file_name, dtable):
-    # need to register in dict, and remove anything already there
-    # close existing writer
+def register_writer(new_key, dtable):
     global dict_writer
-    writer = pq.ParquetWriter(file_name + '.parquet', dtable.schema)
-    dict_writer[file_name] = writer
-    print(file_name + " now registered")
+    writer = pq.ParquetWriter(new_key + '.parquet', dtable.schema)
+    dict_writer[new_key] = writer
+    print(new_key + " now registered")
     return writer
 
 
-def deregister_writer(file_name, old_writer):
+def deregister_writer(key):
     global dict_writer
-    old_writer.close()
+    dict_writer[key].close()
     try:
-        del dict_writer[file_name]
-        print(file_name + " now deregistered")
+        del dict_writer[key]
+        print(key + " now deregistered")
     except:
-        print(file_name + " could not remove from the writer registry.")
+        print(key + " could not remove from the writer registry.")
         pass
 
 
@@ -100,18 +98,13 @@ def get_writer(dict_blob, table):
             if writer_date.date() == refresh_date.date():
                 writer = dict_writer[writer_key]
             elif writer_date.date() < refresh_date.date():
-                deregister_writer(writer_key, dict_writer[writer_key])
+                deregister_writer(writer_key)
                 writer = register_writer(get_file_name(fx_pair, refresh_date), table)
         else:
             # create whole new writer
             writer = register_writer(get_file_name(fx_pair, refresh_date), table)
 
     return writer
-
-
-def process_date():
-    # if existing date (if any), doesn't match blob, then close file.
-    raise NotImplementedError
 
 
 if __name__ == '__main__':
