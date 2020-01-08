@@ -21,6 +21,7 @@ import pickle
 import data_config as dc
 from botocore.exceptions import ClientError
 
+
 class kinesisProducer(threading.Thread):
     def __init__(self, stream_name, partition_key, stream_freq=dc.PRODUCER_STREAM_FREQ):
         super().__init__()

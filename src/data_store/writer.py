@@ -23,11 +23,15 @@ dict_writer = {}
 
 def write_to_parquet(dict_blob):
     print(dict_blob)
-    table = dict_to_table(dict_blob)
-    writer = get_writer(dict_blob, table)
-    if writer:
-        writer.write_table(table=table)
-        print("Written to parquet file.")
+    try:
+        table = dict_to_table(dict_blob)
+        writer = get_writer(dict_blob, table)
+        if writer:
+            writer.write_table(table=table)
+            print("Written to parquet file.")
+    except:
+        # need to close all writer objects
+        pass
 
 
 def dict_to_table(dict_blob):
@@ -70,6 +74,7 @@ def deregister_writer(file_name, old_writer):
         print(file_name + " now deregistered")
     except:
         print(file_name + " could not remove from the writer registry.")
+        pass
 
 
 def get_file_name(fx_pair, refresh_date):
@@ -87,9 +92,7 @@ def get_writer(dict_blob, table):
 
         key_list = [*dict_writer]
         writer_key = next((f for f in key_list if fx_pair in f), None)
-        print("checking writer")
         if writer_key:
-            print("found writer key")
             writer_date = datetime.strptime(writer_key.split('_')[1], '%d%m%Y')
             print("writer date: " + str(writer_date.date()))
             print("refresh date: " + str(refresh_date.date()))
@@ -98,7 +101,7 @@ def get_writer(dict_blob, table):
                 writer = dict_writer[writer_key]
             elif writer_date.date() < refresh_date.date():
                 deregister_writer(writer_key, dict_writer[writer_key])
-                writer = register_writer(get_file_name(fx_pair, refresh_date),table)
+                writer = register_writer(get_file_name(fx_pair, refresh_date), table)
         else:
             # create whole new writer
             writer = register_writer(get_file_name(fx_pair, refresh_date), table)
@@ -112,7 +115,6 @@ def process_date():
 
 
 if __name__ == '__main__':
-    t = pq.read_table('EUR_07012020.parquet')
+    t = pq.read_table('EUR_07012020.parquet', use_threads=True)
     p = t.to_pandas()
     print(p)
-

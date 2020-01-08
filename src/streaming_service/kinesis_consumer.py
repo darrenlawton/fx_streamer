@@ -21,6 +21,7 @@ import data_config as dc
 import data_store.writer as ds
 from botocore.exceptions import ClientError
 
+
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator, stream_freq=dc.CONSUMER_STREAM_FREQ):
         super().__init__()
@@ -68,4 +69,8 @@ class kinesisConsumer:
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
-            [ds.write_to_parquet(i['Realtime Currency Exchange Rate']) for i in data_blob]
+            try:
+                [ds.write_to_parquet(i['Realtime Currency Exchange Rate']) for i in data_blob]
+            except ClientError as e:
+                print(e)
+                pass

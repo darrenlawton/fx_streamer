@@ -11,6 +11,7 @@ import os, time
 import data_config as dc
 from botocore.exceptions import ClientError
 
+
 class kinesisStream():
     def __init__(self, stream_name, n_shards, aws_profile='default'):
         self.stream_name = stream_name
