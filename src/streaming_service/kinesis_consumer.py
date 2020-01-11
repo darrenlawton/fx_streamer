@@ -22,6 +22,19 @@ import data_store.writer as ds
 from botocore.exceptions import ClientError
 
 
+def set_frequency(MillisBehindLatest=0):
+    stream_frequency = dc.CONSUMER_STREAM_FREQ
+
+    try:
+        if MillisBehindLatest > 0:
+            stream_frequency = stream_frequency / dc.CONSUMER_CATCHUP
+    except ClientError as e:
+        print("could not set consumer frequency: {}".format(e))
+        pass
+
+    return stream_frequency
+
+
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator):
         super().__init__()
@@ -29,7 +42,7 @@ class kinesisConsumer:
         self.stream_name = stream_name
         self.shard_id = shard_id
         self.iterator = iterator
-        self.stream_freq = self.set_frequency()
+        self.stream_freq = set_frequency()
 
     @staticmethod
     def iterate_records(records):
@@ -38,18 +51,6 @@ class kinesisConsumer:
             data = pickle.loads(r['Data'])
 
         yield partition_key, data
-
-    def set_frequency(self, MillisBehindLatest=0):
-        stream_frequency = dc.CONSUMER_STREAM_FREQ
-
-        try:
-            if MillisBehindLatest > 0:
-                stream_frequency = stream_frequency / dc.CONSUMER_CATCHUP
-        except ClientError as e:
-            print("could not set consumer frequency: {}".format(e))
-            pass
-
-        return stream_frequency
 
     def run(self, event):
         """
@@ -69,13 +70,14 @@ class kinesisConsumer:
                     self.process_records(records)
 
                 iteration = response['NextShardIterator']
-                self.stream_freq = self.set_frequency(response['MillisBehindLatest'])
+                self.stream_freq = set_frequency(response['MillisBehindLatest'])
                 time.sleep(self.stream_freq)
 
             except ClientError as e:
                 print("Error occurred whilst consuming stream {}".format(e))
                 time.sleep(1)
 
+        ds.deregister_all()
         print("Consumer terminated.")
 
 
@@ -89,9 +91,3 @@ class consumeData(kinesisConsumer):
                     print("Key from record missing!")
                     print(data_blob)
                     pass
-
-
-
-# GetRecords.IteratorAgeMilliseconds
-# The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period. Age is the difference between the current time and when the last record of the GetRecords call was written to the stream. The Minimum and Maximum statistics can be used to track the progress of Kinesis consumer applications. A value of zero indicates that the records being read are completely caught up with the stream.
-# if greater than zero, then shorten sleep time

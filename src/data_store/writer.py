@@ -1,7 +1,13 @@
 import os
 import sys
+import inspect
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def get_filename():
+    return inspect.getframeinfo(inspect.currentframe()).filename
+
 
 # https://medium.com/@bufan.zeng/use-parquet-for-big-data-storage-3b6292598653
 # https://arrow.apache.org/docs/python/parquet.html
@@ -20,6 +26,7 @@ import pyarrow.parquet as pq
 import data_store.s3_interface as s3
 import data_config as dc
 
+global dict_writer
 dict_writer = {}
 
 
@@ -32,7 +39,7 @@ def write_to_parquet(dict_blob):
             writer.write_table(table=table)
             print("Written to parquet file.")
     except:
-        [deregister_writer(key) for key in dict_writer.keys()]
+        deregister_all
         print("parquet file writer exception.")
         pass
 
@@ -60,24 +67,22 @@ def transform_to_df(dict_blob):
 
 
 def register_writer(new_key, dtable):
-    global dict_writer
-    # writer = pq.ParquetWriter('local_temp/' + new_key + '.parquet', dtable.schema)
-    writer = pq.ParquetWriter('src/data_store/local_temp/' + new_key + '.parquet', dtable.schema)
+    writer = pq.ParquetWriter(get_local_store(new_key), dtable.schema)
     dict_writer[new_key] = writer
     print(new_key + " now registered")
     return writer
 
 
 def deregister_writer(key):
-    global dict_writer
     # close parquet writer
     dict_writer[key].close()
 
     # transfer parquet file from local FS to S3
     fx_pair = file_date = key.split('_')[0]
     file_date = datetime.strptime(key.split('_')[1], '%d%m%Y')
-    if s3.upload_file('src/data_store/local_temp/' + key + '.parquet', dc.BUCKET, s3.get_object_name(key, fx_pair, file_date)):
-        os.remove('src/data_store/local_temp/' + key + '.parquet')
+    if s3.upload_file(get_local_store(key), dc.BUCKET,
+                      s3.get_object_name(key, fx_pair, file_date)):
+        os.remove(get_local_store(key))
 
     # remove writer from dictionary registry
     try:
@@ -88,12 +93,19 @@ def deregister_writer(key):
         pass
 
 
+def deregister_all():
+    [deregister_writer(key) for key in dict_writer.keys()]
+
+
+def get_local_store(key):
+    return dc.get_file_path(get_filename()) + '/local_temp/' + key + '.parquet'
+
+
 def get_file_name(fx_pair, refresh_date):
     return fx_pair + "_" + format(refresh_date, '%d%m%Y')
 
 
 def get_writer(dict_blob, table):
-    global dict_writer
     writer = None
 
     # dict keys naming convention: fxpair_date, value will be writer object
@@ -119,7 +131,7 @@ def get_writer(dict_blob, table):
 
 
 if __name__ == '__main__':
-    print(os. getcwd())
-    t = pq.read_table('AUD_09012020.parquet', use_threads=True)
+    print(dc.get_file_path(get_filename()))
+    t = pq.read_table(dc.get_file_path(get_filename()) + '/local_temp/AUD_11012020.parquet', use_threads=True)
     p = t.to_pandas()
     print(p)

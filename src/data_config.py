@@ -32,3 +32,9 @@ BUCKET = 'lawtoninvestmentco'
 
 
 # Autoencoder
+
+
+def get_file_path(filename):
+    return os.path.dirname(os.path.abspath(filename))
+
+
