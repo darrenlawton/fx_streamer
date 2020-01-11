@@ -49,6 +49,12 @@ class kinesisStream():
                 print("Error found while describing the stream: %s" % e)
                 return False
 
+        # Enable enhanced monitoring, if flag set in data_config
+        if dc.ENHANCED_MONITORING:
+            response = self.client.enable_enhanced_monitoring(StreamName=self.stream_name,
+                                                              ShardLevelMetrics=dc.SHARD_LVL_METRICS)
+
         print('kinesis stream active {} '.format(self.stream_name))
+
         return True
 

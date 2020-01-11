@@ -105,8 +105,6 @@ def get_writer(dict_blob, table):
         writer_key = next((f for f in key_list if fx_pair in f), None)
         if writer_key:
             writer_date = datetime.strptime(writer_key.split('_')[1], '%d%m%Y')
-            print("writer date: " + str(writer_date.date()))
-            print("refresh date: " + str(refresh_date.date()))
 
             if writer_date.date() == refresh_date.date():
                 writer = dict_writer[writer_key]
@@ -114,13 +112,14 @@ def get_writer(dict_blob, table):
                 deregister_writer(writer_key)
                 writer = register_writer(get_file_name(fx_pair, refresh_date), table)
         else:
-            # create whole new writer
+            # create new writer
             writer = register_writer(get_file_name(fx_pair, refresh_date), table)
 
     return writer
 
 
 if __name__ == '__main__':
-    t = pq.read_table('local_temp/EUR_07012020.parquet', use_threads=True)
+    print(os. getcwd())
+    t = pq.read_table('AUD_09012020.parquet', use_threads=True)
     p = t.to_pandas()
     print(p)

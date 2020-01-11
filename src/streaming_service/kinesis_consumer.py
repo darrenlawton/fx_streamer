@@ -23,13 +23,13 @@ from botocore.exceptions import ClientError
 
 
 class kinesisConsumer:
-    def __init__(self, stream_name, shard_id, iterator, stream_freq=dc.CONSUMER_STREAM_FREQ):
+    def __init__(self, stream_name, shard_id, iterator):
         super().__init__()
         self.client = boto3.client('kinesis')
         self.stream_name = stream_name
         self.shard_id = shard_id
         self.iterator = iterator
-        self.stream_freq = stream_freq
+        self.stream_freq = self.set_frequency()
 
     @staticmethod
     def iterate_records(records):
@@ -38,6 +38,18 @@ class kinesisConsumer:
             data = pickle.loads(r['Data'])
 
         yield partition_key, data
+
+    def set_frequency(self, MillisBehindLatest=0):
+        stream_frequency = dc.CONSUMER_STREAM_FREQ
+
+        try:
+            if MillisBehindLatest > 0:
+                stream_frequency = stream_frequency / dc.CONSUMER_CATCHUP
+        except ClientError as e:
+            print("could not set consumer frequency: {}".format(e))
+            pass
+
+        return stream_frequency
 
     def run(self, event):
         """
@@ -52,11 +64,12 @@ class kinesisConsumer:
             try:
                 response = self.client.get_records(ShardIterator=iteration)
                 records = response['Records']
+
                 if records:
                     self.process_records(records)
 
                 iteration = response['NextShardIterator']
-
+                self.stream_freq = self.set_frequency(response['MillisBehindLatest'])
                 time.sleep(self.stream_freq)
 
             except ClientError as e:
@@ -69,8 +82,16 @@ class kinesisConsumer:
 class consumeData(kinesisConsumer):
     def process_records(self, records):
         for partition_key, data_blob in self.iterate_records(records):
-            try:
-                [ds.write_to_parquet(i['Realtime Currency Exchange Rate']) for i in data_blob]
-            except ClientError as e:
-                print(e)
-                pass
+            for record in data_blob:
+                try:
+                    if record is not None: ds.write_to_parquet(record['Realtime Currency Exchange Rate'])
+                except KeyError:
+                    print("Key from record missing!")
+                    print(data_blob)
+                    pass
+
+
+
+# GetRecords.IteratorAgeMilliseconds
+# The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period. Age is the difference between the current time and when the last record of the GetRecords call was written to the stream. The Minimum and Maximum statistics can be used to track the progress of Kinesis consumer applications. A value of zero indicates that the records being read are completely caught up with the stream.
+# if greater than zero, then shorten sleep time

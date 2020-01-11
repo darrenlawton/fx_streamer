@@ -8,6 +8,7 @@
 
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import itertools
@@ -30,14 +31,15 @@ class fxClient:
                 params=parameters,
                 timeout=timeout
             )
+
+            if response.status_code == 200:
+                return response.json()
+
         except requests.exceptions.RequestException as e:
             print('Alpha vantage api connection failed: {}'.format(e))
             pass
 
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        return None
 
     def get_fx_rate(self, from_currency: str, to_currency: str = 'USD'):
         """
@@ -72,4 +74,3 @@ if __name__ == '__main__':
     generator = fxClient()
     # print(generator.get_fx_rate(from_currency='AUD'))
     print(generator.get_batch_fx_rate(from_currencies=['AUD', 'EUR']))
-

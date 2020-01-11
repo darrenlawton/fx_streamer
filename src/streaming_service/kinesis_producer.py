@@ -42,7 +42,7 @@ class kinesisProducer(threading.Thread):
         while True:
             try:
                 data = generator_function(from_fx_pairs)
-                self.put_record(data)
+                if data is not None: self.put_record(data)
                 time.sleep(self.stream_freq)
             except self.client.exceptions.ResourceNotFoundException:
                 event.set()

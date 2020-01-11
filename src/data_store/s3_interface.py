@@ -35,6 +35,6 @@ def upload_file(file_name, bucket, object_name=None):
 
 
 def get_object_name(key, fx_pair, stream_date):
-    return "/".join([fx_pair,stream_date.year,stream_date.month,stream_date.day,key])
+    return "/".join([fx_pair, str(stream_date.year), str(stream_date.month), str(stream_date.day), key])
 
 

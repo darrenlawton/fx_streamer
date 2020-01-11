@@ -20,8 +20,11 @@ def validate_key(api_key):
 VALID_STREAM = 'ACTIVE'
 SHARD_ID = 'shardId-000000000000'
 ITERATOR_TYPE = 'TRIM_HORIZON'
+ENHANCED_MONITORING = False
+SHARD_LVL_METRICS = ['IteratorAgeMilliseconds']
 PRODUCER_STREAM_FREQ = 60 * 2.5 # shard iterator expires after 5 minutes
 CONSUMER_STREAM_FREQ = PRODUCER_STREAM_FREQ
+CONSUMER_CATCHUP = 2
 
 
 # AWS S3
