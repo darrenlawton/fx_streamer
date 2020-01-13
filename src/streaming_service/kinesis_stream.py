@@ -16,8 +16,13 @@ class kinesisStream():
     def __init__(self, stream_name, n_shards, aws_profile='default'):
         self.stream_name = stream_name
         self.n_shards = n_shards
-        os.environ['AWS_PROFILE'] = aws_profile
-        self.client = boto3.client('kinesis')
+
+        try:
+            os.environ['AWS_PROFILE'] = aws_profile
+            self.client = boto3.client('kinesis')
+        except:
+            print("Error, could not configure AWS profile.")
+            sys.exit()
 
     def create_stream(self):
         try:

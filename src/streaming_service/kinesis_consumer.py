@@ -22,19 +22,6 @@ import data_store.writer as ds
 from botocore.exceptions import ClientError
 
 
-def set_frequency(MillisBehindLatest=0):
-    stream_frequency = dc.CONSUMER_STREAM_FREQ
-
-    try:
-        if MillisBehindLatest > 0:
-            stream_frequency = stream_frequency / dc.CONSUMER_CATCHUP
-    except ClientError as e:
-        print("could not set consumer frequency: {}".format(e))
-        pass
-
-    return stream_frequency
-
-
 class kinesisConsumer:
     def __init__(self, stream_name, shard_id, iterator):
         super().__init__()
@@ -42,7 +29,7 @@ class kinesisConsumer:
         self.stream_name = stream_name
         self.shard_id = shard_id
         self.iterator = iterator
-        self.stream_freq = set_frequency()
+        self.stream_freq = self.set_frequency()
 
     @staticmethod
     def iterate_records(records):
@@ -51,6 +38,19 @@ class kinesisConsumer:
             data = pickle.loads(r['Data'])
 
         yield partition_key, data
+
+    @staticmethod
+    def set_frequency(MillisBehindLatest=0):
+        stream_frequency = dc.CONSUMER_STREAM_FREQ
+
+        try:
+            if MillisBehindLatest > 0:
+                stream_frequency = stream_frequency / dc.CONSUMER_CATCHUP
+        except ClientError as e:
+            print("could not set consumer frequency: {}".format(e))
+            pass
+
+        return stream_frequency
 
     def run(self, event):
         """
@@ -70,7 +70,7 @@ class kinesisConsumer:
                     self.process_records(records)
 
                 iteration = response['NextShardIterator']
-                self.stream_freq = set_frequency(response['MillisBehindLatest'])
+                self.stream_freq = self.set_frequency(response['MillisBehindLatest'])
                 time.sleep(self.stream_freq)
 
             except ClientError as e:

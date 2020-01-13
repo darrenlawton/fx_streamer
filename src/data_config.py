@@ -5,7 +5,7 @@ import sys
 AV_HOST = 'https://www.alphavantage.co/query'
 AV_API_KEY = os.getenv('PREM_ALPHA_VANTAGE_KEY')
 AV_FUNCTION_CALL = "CURRENCY_EXCHANGE_RATE" # This API returns the realtime exchange rate for any pair of digital currency (e.g., Bitcoin) and physical currency (e.g., USD). Data returned for physical currency (Forex) pairs also include realtime bid and ask prices.
-AV_FX_FROM = ['AUD', 'GBP', 'EUR']
+AV_FX_FROM = ['AUD', 'GBP', 'EUR', 'JPY']
 
 
 def validate_key(api_key):
