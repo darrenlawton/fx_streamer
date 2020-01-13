@@ -31,9 +31,6 @@ CONSUMER_CATCHUP = 2
 BUCKET = 'lawtoninvestmentco'
 
 
-# Autoencoder
-
-
 def get_file_path(filename):
     return os.path.dirname(os.path.abspath(filename))
 

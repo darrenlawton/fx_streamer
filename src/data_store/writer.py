@@ -31,7 +31,6 @@ dict_writer = {}
 
 
 def write_to_parquet(dict_blob):
-    print(dict_blob)
     try:
         table = dict_to_table(dict_blob)
         writer = get_writer(dict_blob, table)
