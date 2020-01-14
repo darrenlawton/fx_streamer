@@ -36,7 +36,6 @@ def write_to_parquet(dict_blob):
         writer = get_writer(dict_blob, table)
         if writer:
             writer.write_table(table=table)
-            print("Written to parquet file.")
     except:
         deregister_all
         print("parquet file writer exception.")
