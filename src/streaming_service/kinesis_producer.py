@@ -31,8 +31,10 @@ class kinesisProducer(threading.Thread):
         self.stream_freq = int(stream_freq)
 
     def put_record(self, data):
-        self.client.put_record(StreamName=self.stream_name, Data=pickle.dumps(data), PartitionKey=self.partition_key)
-        print("Put record at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        try:
+            self.client.put_record(StreamName=self.stream_name, Data=pickle.dumps(data), PartitionKey=self.partition_key)
+        except ClientError as e:
+            print("Put failed at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def run(self, generator_function, from_fx_pairs, event):
         """
