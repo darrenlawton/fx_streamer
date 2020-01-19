@@ -88,6 +88,6 @@ class consumeData(kinesisConsumer):
                 try:
                     if record is not None: ds.write_to_parquet(record['Realtime Currency Exchange Rate'])
                 except KeyError:
-                    print("Key from record missing!")
+                    print("Record key missing!")
                     print(data_blob)
                     pass
