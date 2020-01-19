@@ -76,7 +76,7 @@ def deregister_writer(key):
     dict_writer[key].close()
 
     # transfer parquet file from local FS to S3
-    fx_pair = file_date = key.split('_')[0]
+    fx_pair = key.split('_')[0]
     file_date = datetime.strptime(key.split('_')[1], '%d%m%Y')
     if s3.upload_file(get_local_store(key), dc.BUCKET,
                       s3.get_object_name(key, fx_pair, file_date)):
