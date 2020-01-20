@@ -129,7 +129,7 @@ def get_writer(dict_blob, table):
 
 
 if __name__ == '__main__':
-    print(dc.get_file_path(get_filename()))
-    t = pq.read_table(dc.get_file_path(get_filename()) + '/local_temp/AUD_11012020.parquet', use_threads=True)
+    # print(dc.get_file_path(get_filename()))
+    # t = pq.read_table(dc.get_file_path(get_filename()) + '/local_temp/AUD_11012020.parquet', use_threads=True)
     p = t.to_pandas()
     print(p)

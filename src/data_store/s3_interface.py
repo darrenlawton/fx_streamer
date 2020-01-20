@@ -35,6 +35,15 @@ def upload_file(file_name, bucket, object_name=None):
 
 
 def get_object_name(key, fx_pair, stream_date):
-    return "/".join([fx_pair, str(stream_date.year), str(stream_date.month), str(stream_date.day), key])
+    return "/".join([fx_pair, str(stream_date.year), str(stream_date.month), key])
 
+import pyarrow.parquet as pq
+import io
+import pandas as pd
+if __name__ == '__main__':
+    s3_client = boto3.client('s3')
+    obj = s3_client.get_object(Bucket='lawtoninvestmentco', Key='AUD/2020/1/18/AUD_18012020')
+    t = pq.read_table(io.BytesIO(obj['Body'].read()), use_threads=True)
+    p = t.to_pandas()
+    print(p.head())
 
