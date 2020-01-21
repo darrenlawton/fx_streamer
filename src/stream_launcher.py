@@ -4,10 +4,11 @@ from streaming_service import kinesis_consumer
 from alpha_vantage import generator
 
 import argparse
-import multiprocessing
+import multiprocessing, sys
 import time, datetime
 import data_config as dc
 import signal
+
 
 def trigger_producer(stream_name, partition_key, fx_generator, event):
     # Create and run producer. Need to also define generator function for run method.
@@ -25,6 +26,11 @@ def start_process(process_obj):
     if isinstance(process_obj, multiprocessing.context.Process):
         process_obj.start()
         print(process_obj.name + " process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+
+def shutdown_method():
+    kinesis_stream.terminate_stream()
+    sys.exit()
 
 
 if __name__ == '__main__':
@@ -56,7 +62,7 @@ if __name__ == '__main__':
         time.sleep(5)
         start_process(cons)
 
-        signal.signal(signal.SIGTERM, kinesis_stream.terminate_stream())
+        signal.signal(signal.SIGTERM, shutdown_method)
         prod.join(), cons.join()
         kinesis_stream.terminate_stream()
 
