@@ -10,6 +10,7 @@ import boto3
 import os, time
 import data_config as dc
 from botocore.exceptions import ClientError
+from src.data_store import writer
 
 
 class kinesisStream():
@@ -37,6 +38,7 @@ class kinesisStream():
 
     def terminate_stream(self):
         try:
+            writer.deregister_all()
             self.client.delete_stream(StreamName=self.stream_name)
         except ClientError as e:
             print("Unable to delete kinesis stream: {}".format(e))

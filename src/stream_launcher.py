@@ -7,7 +7,7 @@ import argparse
 import multiprocessing
 import time, datetime
 import data_config as dc
-
+import signal
 
 def trigger_producer(stream_name, partition_key, fx_generator, event):
     # Create and run producer. Need to also define generator function for run method.
@@ -56,6 +56,7 @@ if __name__ == '__main__':
         time.sleep(5)
         start_process(cons)
 
+        signal.signal(signal.SIGTERM, kinesis_stream.terminate_stream())
         prod.join(), cons.join()
         kinesis_stream.terminate_stream()
 
