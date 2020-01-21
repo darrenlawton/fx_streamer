@@ -10,7 +10,7 @@ import boto3
 import os, time
 import data_config as dc
 from botocore.exceptions import ClientError
-from src.data_store import writer
+from data_store import writer
 
 
 class kinesisStream():
