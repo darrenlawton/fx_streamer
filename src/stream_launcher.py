@@ -28,7 +28,8 @@ def start_process(process_obj):
         print(process_obj.name + " process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
-def shutdown_method():
+def stop(sig, frame):
+    print("Shutdown signal received: " & sig)
     kinesis_stream.terminate_stream()
     sys.exit()
 
@@ -62,8 +63,11 @@ if __name__ == '__main__':
         time.sleep(5)
         start_process(cons)
 
-        signal.signal(signal.SIGTERM, shutdown_method)
+        signal.signal(signal.SIGTERM, stop)
+        signal.signal(signal.SIGHUP, stop)
+
         prod.join(), cons.join()
+
         kinesis_stream.terminate_stream()
 
 # python3.6 src/stream_launcher.py -n "test" -p  "test" -s 1
