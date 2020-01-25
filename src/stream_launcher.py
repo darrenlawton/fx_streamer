@@ -8,6 +8,7 @@ import multiprocessing, sys
 import time, datetime
 import data_config as dc
 import signal
+from datetime import datetime
 
 
 def trigger_producer(stream_name, partition_key, fx_generator, event):
@@ -26,6 +27,10 @@ def start_process(process_obj):
     if isinstance(process_obj, multiprocessing.context.Process):
         process_obj.start()
         print(process_obj.name + " process started at %s ." % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+
+def check_run_time():
+    return datetime.utcnow().weekday() == 0
 
 
 def stop(sig, frame):
@@ -48,26 +53,27 @@ if __name__ == '__main__':
     aws_profile = args.u
 
     # Create kinesis stream
-    if aws_profile:
-        kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards, aws_profile)
-    else:
-        kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards)
+    if check_run_time:
+        if aws_profile:
+            kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards, aws_profile)
+        else:
+            kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards)
 
-    if kinesis_stream.create_stream():
-        e = multiprocessing.Event()
-        prod = multiprocessing.Process(name='producer', target=trigger_producer,
-                                       args=(input_stream_name, input_partition_key, generator.fxClient(), e))
-        cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name, e))
+        if kinesis_stream.create_stream():
+            e = multiprocessing.Event()
+            prod = multiprocessing.Process(name='producer', target=trigger_producer,
+                                           args=(input_stream_name, input_partition_key, generator.fxClient(), e))
+            cons = multiprocessing.Process(name='consumer', target=trigger_consumer, args=(input_stream_name, e))
 
-        start_process(prod)
-        time.sleep(5)
-        start_process(cons)
+            start_process(prod)
+            time.sleep(5)
+            start_process(cons)
 
-        signal.signal(signal.SIGTERM, stop)
-        signal.signal(signal.SIGHUP, stop)
+            signal.signal(signal.SIGTERM, stop)
+            signal.signal(signal.SIGHUP, stop)
 
-        prod.join(), cons.join()
+            prod.join(), cons.join()
 
-        kinesis_stream.terminate_stream()
+            kinesis_stream.terminate_stream()
 
 # python3.6 src/stream_launcher.py -n "test" -p  "test" -s 1
