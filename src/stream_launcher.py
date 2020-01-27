@@ -8,7 +8,6 @@ import multiprocessing, sys
 import time, datetime
 import data_config as dc
 import signal
-from datetime import datetime
 
 
 def trigger_producer(stream_name, partition_key, fx_generator, event):
@@ -30,7 +29,7 @@ def start_process(process_obj):
 
 
 def check_run_time():
-    return datetime.utcnow().weekday() == 0
+    return datetime.datetime.utcnow().weekday() == 0
 
 
 def stop(sig, frame):
