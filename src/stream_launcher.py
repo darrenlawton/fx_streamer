@@ -33,7 +33,7 @@ def check_run_time():
 
 
 def stop(sig, frame):
-    print("Shutdown signal received: " & sig)
+    print("Shutdown signal received: " & str(sig))
     kinesis_stream.terminate_stream()
     sys.exit()
 
