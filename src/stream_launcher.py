@@ -44,15 +44,17 @@ if __name__ == '__main__':
     parser.add_argument('-p', help='Partition key', required=True)
     parser.add_argument('-s', help='Number of shards', required=True)
     parser.add_argument('-u', help='AWS profile')
+    parser.add_argument('-b', help='Bypass time check', default=False)
     args = parser.parse_args()
 
     input_stream_name = args.n
     input_partition_key = args.p
     n_shards = int(args.s)
     aws_profile = args.u
+    time_check_bypass = args.b
 
     # Create kinesis stream
-    if check_run_time:
+    if check_run_time or time_check_bypass:
         if aws_profile:
             kinesis_stream = kinesis_stream.kinesisStream(input_stream_name, n_shards, aws_profile)
         else:
