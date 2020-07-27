@@ -1,7 +1,7 @@
 from streaming_service import kinesis_stream
 from streaming_service import kinesis_producer
 from streaming_service import kinesis_consumer
-from alpha_vantage import generator
+from src.data_apis.alpha_vantage import generator
 
 import argparse
 import multiprocessing, sys
