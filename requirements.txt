@@ -6,7 +6,7 @@ boto3==1.9.211
 botocore==1.12.211
 certifi==2019.6.16
 chardet==3.0.4
-Django==2.2.8
+django>=2.2.13
 django-crum==0.7.3
 django-layers-hr==1.11.1
 docutils==0.15.2
