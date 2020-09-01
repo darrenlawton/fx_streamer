@@ -28,7 +28,7 @@ CONSUMER_CATCHUP = 2
 
 
 # AWS S3
-BUCKET = 'lawtoninvestmentco'
+BUCKET = ''
 
 
 def get_file_path(filename):
