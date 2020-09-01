@@ -42,7 +42,7 @@ import io
 import pandas as pd
 if __name__ == '__main__':
     s3_client = boto3.client('s3')
-    obj = s3_client.get_object(Bucket='lawtoninvestmentco', Key='AUD/2020/1/18/AUD_18012020')
+    obj = s3_client.get_object(Bucket='', Key='AUD/2020/1/18/AUD_18012020')
     t = pq.read_table(io.BytesIO(obj['Body'].read()), use_threads=True)
     p = t.to_pandas()
     print(p.head())
